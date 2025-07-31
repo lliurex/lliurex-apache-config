@@ -1,0 +1,13 @@
+Source: lliurex-apache-config
+Section: admin
+Priority: optional
+Maintainer: Equipo LliureX <lliurex@gva.es>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.1.2
+
+Package: lliurex-apache-config
+Depends: ${shlibs:Depends}, ${misc:Depends}, apache2
+Architecture: all
+Description: LliureX apache2 configuration
+ This package installs apache2 server configuration for
+ LliureX classrooms environment

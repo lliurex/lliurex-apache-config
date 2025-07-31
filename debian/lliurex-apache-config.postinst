@@ -1,0 +1,53 @@
+#!/bin/sh
+
+set -e
+
+# COMMON VARIABLES
+APACHE_PATH="/etc/apache2/"
+PACKAGE_NAME="lliurex-apache-config"
+ORIGINAL_FILE=$APACHE_PATH"sites-available/000-default.conf" 
+DIVERT_FILE=$APACHE_PATH"sites-available/000-default.orig" 
+LLIUREX_FILE=$APACHE_PATH"sites-available/llx-default.conf"
+SYM_LINK="/var/www/share" 
+INDEX_LINK="/var/www/index.html"
+ORIG_INDEX="/var/www/html/index.html"
+
+case $1 in
+        configure)
+
+		if [ ! -r ${DIVERT_FILE} ] ; then 
+
+			dpkg-divert --package ${PACKAGE_NAME} --rename --quiet --add --divert  ${DIVERT_FILE}  ${ORIGINAL_FILE} || true
+			ln -fs ${LLIUREX_FILE}  ${ORIGINAL_FILE} || true
+
+		fi
+
+
+		if [ ! -L ${SYM_LINK} ] ; then
+
+			ln -s /net/server-sync/share $SYM_LINK || true
+
+			if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+
+		        	. /usr/share/apache2/apache2-maintscript-helper
+				apache2_invoke ensite share || true
+			fi
+			 
+		fi
+
+		if [ ! -L ${INDEX_LINK} ];then
+			ln -s $ORIG_INDEX $INDEX_LINK || true
+		fi
+
+		systemctl restart apache2 || true
+
+               ;;
+	*)
+	        echo "[DEBUG] Unknow action ..."
+	        ;;
+		
+esac
+		
+#DEBHELPER#
+
+exit 0		
